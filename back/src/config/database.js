@@ -9,10 +9,6 @@ const pool = new Pool(
     }
 );
 
-pool.on('connect', () =>{
-    console.log('Base de dados conectada com sucesso');
-});
-
 module.exports = {
     query : (text, params) => pool.query(text, params) // define uma funcao 'query' que chama 'query' de pool
 };
