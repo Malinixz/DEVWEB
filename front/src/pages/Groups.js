@@ -141,7 +141,7 @@ function Groups() {
           </TableHead>
           <TableBody>
             {groupsData && groupsData.map((group, index) => (
-              <TableRow key={index} component={Link} to={`/Group/${group.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <TableRow key={index} component={Link} to={`/GroupMembers/${group.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <TableCell>{group.nome}</TableCell>
                 <TableCell>{group.quantidade_membros}</TableCell>
                 <TableCell>{group.quantidade_atividades}</TableCell>
