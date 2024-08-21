@@ -4,10 +4,17 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, T
 
 /*
     Componente chama Modal para adicionar user por email.
+    Parâmetros
+        id: ID do grupo
+        token: token de autorização
+        open: estado de aberto do modal.
+        onClose: estado de fechado do modal.
+        onMemberAdded: callback function para fetch da lista de mebros.
 */
 function AddMemberModal({ id, token, open, onClose, onMemberAdded   })
 {
     const [user_email, setUserEmail] = useState('');
+    const [user_id] = '';
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -16,7 +23,7 @@ function AddMemberModal({ id, token, open, onClose, onMemberAdded   })
         /*Se nao ha email, avisa o usuario*/
         if (!user_email)
         {
-            window.alert('Please provide user email.');
+            window.alert('Coloque o email do usuário.');
             return;
         }
 

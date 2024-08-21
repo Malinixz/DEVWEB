@@ -45,15 +45,13 @@ const GroupMembers = () => {
     };
 
      /*Aqui, o Hook fetchMembers eh chamado quando o componente renderiza ou quando o id do grupo muda.*/
-     useEffect(() => {
-        fetchMembers();
-    }, [id]);
+     useEffect(() => {fetchMembers();}, [id]);
     /*--------------------------------------------------------------------------------------------------------------------------------------------*/
 
     return (
         <Container>
             <AddMember id={id} token={token}  onMemberAdded={fetchMembers}></AddMember>
-            <MemberList members={members}></MemberList>
+            <MemberList  id={id} token={token} onMemberRemovedOrUpdated={fetchMembers} members={members} ></MemberList>
         </Container>
     );
 };

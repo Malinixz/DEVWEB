@@ -207,8 +207,15 @@ exports.listGroupMembers = async (req, res) => {
 };
 
 exports.deleteUser = async (req, res) => {
-    const { group_id } = req.params; // Obtém o id_grupo da URL
-    const { user_id } = req.body; // Obtém o id_usuario do corpo da requisição
+    const { group_id } = req.params;
+    const { user_id } = req.body;
+
+    if (!Number.isInteger(parseInt(group_id)) || !Number.isInteger(parseInt(user_id))) {
+        return res.status(400).send({
+            sucesso: 0,
+            erro: "IDs inválidos fornecidos"
+        });
+    }
 
     try {
         // Verificar se o usuário é o criador do grupo
@@ -217,10 +224,30 @@ exports.deleteUser = async (req, res) => {
             [group_id]
         );
 
+        if (creatorCheck.rows.length === 0) {
+            return res.status(404).send({
+                sucesso: 0,
+                erro: "Grupo não encontrado"
+            });
+        }
+
         if (creatorCheck.rows[0].criado_por === user_id) {
             return res.status(403).send({
                 sucesso: 0,
                 erro: "Não é permitido excluir o criador do grupo"
+            });
+        }
+
+        // Verificar se o usuário faz parte do grupo
+        const userCheck = await db.query(
+            "SELECT id FROM membros_grupo WHERE id_usuario = $1 AND id_grupo = $2",
+            [user_id, group_id]
+        );
+
+        if (userCheck.rows.length === 0) {
+            return res.status(404).send({
+                sucesso: 0,
+                erro: "Usuário não encontrado no grupo"
             });
         }
 
