@@ -31,7 +31,7 @@ function MemberList({ id, token, onMemberRemovedOrUpdated, members }) {
                             <TableCell>{member.email}</TableCell>
                             <TableCell>{new Date(member.data_entrada).toLocaleDateString()}</TableCell>
                             <TableCell>{member.is_admin ? 'Administrador' : 'Regular'}</TableCell>
-                            <TableCell> <RemoveOrUpdateDialog id={id} token={token} user_id={member.id} onMemberRemovedOrUpdated={onMemberRemovedOrUpdated}></RemoveOrUpdateDialog> </TableCell>
+                            <TableCell> <RemoveOrUpdateDialog id={id} token={token} user_id={member.id} onMemberRemovedOrUpdated={onMemberRemovedOrUpdated} is_admin={member.is_admin}></RemoveOrUpdateDialog> </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

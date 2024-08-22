@@ -38,9 +38,35 @@ async function RemoveMember({ id, token, user_id, onMemberRemovedOrUpdated, onCl
 /*
     Função chama backend para atualizar membro para Admin.
 */
-async function UpdateToAdmin({id, token, user_id, onMemberRemovedOrUpdated, onClose})
+async function UpdateMemberStatus({id, token, user_id, onMemberRemovedOrUpdated, onClose, is_admin})
 {
-    window.alert('Ainda não implementado.');
+    try {
+        const response = await axios.put(`${process.env.REACT_APP_HTTP_URL}/groups/${id}/memberStatus`, 
+            { 
+                user_id,
+                is_admin : !is_admin
+            }, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        /*Se PUT foi bem sucedido*/
+        if (response.status === 200) {
+            const action = is_admin ? 'removido de' : 'promovido a';
+            console.log(`Membro ${action} administrador com sucesso.`);
+            window.alert(`Membro ${action} administrador com sucesso.`);
+            onMemberRemovedOrUpdated();  // Callback function para fetchMembers() para atualizar lista
+            onClose();                   // Callback function para DialogProps.onClose() para fechar modal de dialogo
+        }
+    }
+
+    /*Tratamento de erro*/
+    catch (error) {
+        console.error('Error:', error);
+        window.alert(`Erro ao atualizar status de administrador: ${error.response ? error.response.data.erro : error.message}`);
+    }
 }
 
 /*
@@ -51,7 +77,7 @@ async function UpdateToAdmin({id, token, user_id, onMemberRemovedOrUpdated, onCl
         user_id: ID do usuário selecionado na lista de membros.
         onMemberRemovedOrUpdated: callback function para fetch da lista de membros.
 */
-function RemoveOrUpdateDialog({id, token, user_id, onMemberRemovedOrUpdated})
+function RemoveOrUpdateDialog({id, token, user_id, onMemberRemovedOrUpdated, is_admin})
 {
     /*Estado de Modal aberto ou fechado*/
     const [open, setOpen] = useState(false);
@@ -88,7 +114,7 @@ function RemoveOrUpdateDialog({id, token, user_id, onMemberRemovedOrUpdated})
         /*Tenta requisição PUT*/
         try
         {
-            await UpdateToAdmin({id, token, user_id, onMemberRemovedOrUpdated, onClose: handleClose});
+            await UpdateMemberStatus({id, token, user_id, onMemberRemovedOrUpdated, onClose: handleClose, is_admin});
         }
         finally
         {
@@ -106,7 +132,7 @@ function RemoveOrUpdateDialog({id, token, user_id, onMemberRemovedOrUpdated})
             <Dialog open={open} onClose={handleClose}>
                 <DialogActions>
                     <Button onClick={handleRemoveMember} color="primary" disabled={loading}> {loading ? 'Removendo...' : 'Remover Membro'} </Button>
-                    <Button onClick={handleUpdateMember} color="primary" disabled={loading}> {loading ? 'Atualizando...' : 'Tornar Admin'} </Button>
+                    <Button onClick={handleUpdateMember} color="primary" disabled={loading}> {loading ? 'Atualizando...' : is_admin ? 'Remover da Lista de Admins' : 'Tornar Admin'} </Button>
                     <Button onClick={handleClose} color="error"> Cancelar </Button>
                 </DialogActions>
             </Dialog>

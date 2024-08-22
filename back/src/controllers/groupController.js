@@ -1,5 +1,35 @@
 const db = require('../config/database');
 
+async function checkUserInGroup(group_id, user_id) {
+    const result = await db.query(
+        "SELECT id_usuario FROM membros_grupo WHERE id_grupo = $1 AND id_usuario = $2",
+        [group_id, user_id]
+    );
+    return result.rows.length > 0;
+}
+
+async function checkGroupCreator(group_id, user_id) {
+    const result = await db.query(
+        "SELECT * FROM grupos WHERE id = $1 AND criado_por = $2",
+        [group_id, user_id]
+    );
+    return result.rows.length > 0;
+}
+
+function validateIds(group_id, user_id) {
+    if (!Number.isInteger(parseInt(group_id)) || !Number.isInteger(parseInt(user_id))) {
+        return false;
+    }
+    return true;
+}
+
+function handleError(res, message, status = 500) {
+    return res.status(status).json({
+        sucesso: 0,
+        erro: message
+    });
+}
+
 exports.createGroup = async (req, res) => {
     const { nome, descricao } = req.body;
     const criado_por = req.user.id;
@@ -9,7 +39,6 @@ exports.createGroup = async (req, res) => {
             [nome, descricao, criado_por]
         );
         const grupo = result.rows[0];
-        // Adiciona o criador do grupo como administrador
         await db.query(
             "INSERT INTO membros_grupo (id_grupo, id_usuario, is_admin) VALUES ($1, $2, TRUE)",
             [grupo.id, criado_por]
@@ -19,69 +48,41 @@ exports.createGroup = async (req, res) => {
             grupo
         });
     } catch (err) {
-        res.status(500).json({
-            sucesso: 0,
-            cod_erro: 2,
-            erro: "Erro BD: " + err.message
-        });
+        handleError(res, "Erro BD: " + err.message);
     }
 };
 
 exports.addUser = async (req, res) => {
-    const { group_id } = req.params; // Obtém o id_grupo da URL
-    const { user_id, user_email } = req.body; // Verifica se user_id ou user_email foi passado
+    const { group_id } = req.params;
+    const { user_id, user_email } = req.body;
+
+    let userId = user_id;
+
+    if (!user_id && user_email) {
+        const userCheck = await db.query(
+            "SELECT id FROM usuarios WHERE email = $1",
+            [user_email]
+        );
+        if (userCheck.rows.length === 0) {
+            return handleError(res, "Usuário não encontrado", 404);
+        }
+        userId = userCheck.rows[0].id;
+    }
+
+    if (!userId) {
+        return handleError(res, "Nenhum user_id ou user_email fornecido", 400);
+    }
 
     try {
-        // Verificar se o grupo existe
-        const groupCheck = await db.query(
-            "SELECT id FROM grupos WHERE id = $1",
-            [group_id]
-        );
-
-        if (groupCheck.rows.length === 0) {
-            return res.status(404).send({
-                erro: "Grupo não encontrado"
-            });
-        }
-
-        let userId = user_id;
-
-        // Se o user_id não foi fornecido, procurar pelo user_email
-        if (!user_id && user_email) {
-            const userCheck = await db.query(
-                "SELECT id FROM usuarios WHERE email = $1",
-                [user_email]
-            );
-
-            if (userCheck.rows.length === 0) {
-                return res.status(404).send({
-                    erro: "Usuário não encontrado"
-                });
-            }
-
-            userId = userCheck.rows[0].id;
-        }
-
-        if (!userId) {
-            return res.status(400).send({
-                erro: "Nenhum user_id ou user_email fornecido"
-            });
-        }
-
-        // Adicionar o usuário ao grupo
         await db.query(
             "INSERT INTO membros_grupo (id_usuario, id_grupo) VALUES ($1, $2)",
             [userId, group_id]
         );
-
-        return res.status(200).send({
+        res.status(200).send({
             mensagem: "Usuário adicionado ao grupo com sucesso"
         });
-
     } catch (err) {
-        return res.status(500).send({
-            erro: "Erro BD: " + err.message
-        });
+        handleError(res, "Erro BD: " + err.message);
     }
 };
 
@@ -154,30 +155,14 @@ exports.listGroups = async (req, res) => {
             totalGrupos: totalGroups.rows[0].count
         });
     } catch (err) {
-        return res.status(500).send({
-            sucesso: 0,
-            erro: "Erro BD: " + err.message
-        });
+        handleError(res, "Erro BD: " + err.message);
     }
-}
+};
 
 exports.listGroupMembers = async (req, res) => {
     const { group_id } = req.params;
 
     try {
-        // Verificar se o grupo existe
-        const groupCheck = await db.query(
-            "SELECT id FROM grupos WHERE id = $1",
-            [group_id]
-        );
-
-        if (groupCheck.rows.length === 0) {
-            return res.status(404).send({
-                erro: "Grupo não encontrado"
-            });
-        }
-
-        // Buscar os membros do grupo, ordenando os administradores primeiro
         const result = await db.query(`
             SELECT 
                 u.id, 
@@ -200,9 +185,7 @@ exports.listGroupMembers = async (req, res) => {
         });
 
     } catch (err) {
-        return res.status(500).send({
-            erro: "Erro BD: " + err.message
-        });
+        handleError(res, "Erro BD: " + err.message);
     }
 };
 
@@ -210,62 +193,58 @@ exports.deleteUser = async (req, res) => {
     const { group_id } = req.params;
     const { user_id } = req.body;
 
-    if (!Number.isInteger(parseInt(group_id)) || !Number.isInteger(parseInt(user_id))) {
-        return res.status(400).send({
-            sucesso: 0,
-            erro: "IDs inválidos fornecidos"
-        });
+    if (!validateIds(group_id, user_id)) {
+        return handleError(res, "IDs inválidos fornecidos", 400);
     }
 
     try {
-        // Verificar se o usuário é o criador do grupo
-        const creatorCheck = await db.query(
-            "SELECT criado_por FROM grupos WHERE id = $1",
-            [group_id]
-        );
-
-        if (creatorCheck.rows.length === 0) {
-            return res.status(404).send({
-                sucesso: 0,
-                erro: "Grupo não encontrado"
-            });
+        if (await checkGroupCreator(group_id, user_id)) {
+            return handleError(res, "Não é permitido excluir o criador do grupo", 403);
         }
 
-        if (creatorCheck.rows[0].criado_por === user_id) {
-            return res.status(403).send({
-                sucesso: 0,
-                erro: "Não é permitido excluir o criador do grupo"
-            });
+        if (!(await checkUserInGroup(group_id, user_id))) {
+            return handleError(res, "Usuário não encontrado no grupo", 404);
         }
 
-        // Verificar se o usuário faz parte do grupo
-        const userCheck = await db.query(
-            "SELECT id FROM membros_grupo WHERE id_usuario = $1 AND id_grupo = $2",
-            [user_id, group_id]
-        );
-
-        if (userCheck.rows.length === 0) {
-            return res.status(404).send({
-                sucesso: 0,
-                erro: "Usuário não encontrado no grupo"
-            });
-        }
-
-        // Deletar o usuário do grupo
         await db.query(
             "DELETE FROM membros_grupo WHERE id_usuario = $1 AND id_grupo = $2",
             [user_id, group_id]
         );
 
-        return res.status(200).send({
+        res.status(200).send({
             sucesso: 1,
             mensagem: "Usuário removido do grupo com sucesso"
         });
 
     } catch (err) {
-        return res.status(500).send({
-            sucesso: 0,
-            erro: "Erro BD: " + err.message
+        handleError(res, "Erro BD: " + err.message);
+    }
+};
+
+exports.updateMemberStatus = async (req, res) => {
+    const { group_id } = req.params;
+    const { user_id, is_admin } = req.body;
+
+    try {
+        if (await checkGroupCreator(group_id, user_id)) {
+            return handleError(res, "Não é permitido atualizar status do criador do grupo", 403);
+        }
+
+        if (!(await checkUserInGroup(group_id, user_id))) {
+            return handleError(res, "Usuário não está no grupo", 404);
+        }
+
+        await db.query(
+            "UPDATE membros_grupo SET is_admin = $1 WHERE id_grupo = $2 AND id_usuario = $3",
+            [is_admin, group_id, user_id]
+        );
+
+        const action = is_admin ? 'promovido a' : 'removido de';
+        res.status(200).send({
+            msg: `Usuário ${action} administrador com sucesso`
         });
+
+    } catch (err) {
+        handleError(res, "Erro BD: " + err.message);
     }
 };
