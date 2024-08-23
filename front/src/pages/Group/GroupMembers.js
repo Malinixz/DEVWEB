@@ -1,58 +1,55 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container } from '@mui/material';
 import axios from 'axios';
 import MemberList from '../../components/MemberList';
 import AddMember from '../../components/AddMember';
+import PageContainerGroup from '../../components/PageContainerGroup';
 
-/*Esse componente exibe os membros de um grupo específico baseado no ID do grupo.*/
-const GroupMembers = () => {
-    /*Pega o param id da URL*/
+async function fetchMembers(groupId, token)
+{
+    try
+    {
+        const response = await axios.get(`${process.env.REACT_APP_HTTP_URL}/groups/${groupId}/members`, { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }});
+
+        if (response.status === 200)
+        {
+            return response.data.membros;
+        }
+    }
+    catch (error)
+    {
+        console.error('Error:', error);
+        window.alert(`Erro ao obter membros do grupo: ${error.response ? error.response.data.erro : error.message}`);
+        throw error;
+    }
+};
+
+function GroupMembers()
+{
     const { id } = useParams();
-
-    /*Recupera o athentication token guardado no local storage.*/
-    /*Esse token eh usado para autenticar requisicoes API*/
     const token = localStorage.getItem('token');
-
-    /*LISTAR MEMBROS------------------------------------------------------------------------------------------------------------------------------*/
-    /*Guarda o estado da lista de membros no componente*/
     const [members, setMembers] = useState([]);
 
-    /*Faz um fetch da lista de grupos da backend API.*/
-    const fetchMembers = async () => {
-        try {
-            /*Usa Axios para fazer uma request GET para a backend API*/
-            /*Essa URL inclui o ID do grupo, e o request headers inclui o authentication token*/
-            const response = await axios.get(`${process.env.REACT_APP_HTTP_URL}/groups/${id}/members`, {
-                headers: { 
-                    'Authorization': `Bearer ${token}`, // Adiciona o token para autenticacao
-                    'Content-Type': 'application/json'  // Indica que estah enviando json data
-                }
-            });
-
-            // Se a request eh bem sucedida (status code 200), faz um state update com a lista de membros.
-            if (response.status === 200)
-            {
-                setMembers(response.data.membros); // Os membros sao armazenados em response.data.membros
-            }
-        } 
+    const loadMembers = async () =>    
+    {
+        try
+        {
+            const membersData = await fetchMembers(id, token);
+            setMembers(membersData);
+        }
         catch (error)
         {
-            /*Se tem erro (e.g., network issue or server error), loga no console e mostra alerta para o user.*/
-            console.error('Error:', error);
-            window.alert(`Erro ao obter membros do grupo: ${error.response ? error.response.data.erro : error.message}`);
+            console.error('Falhou ao carregar membros', error);
         }
     };
 
-     /*Aqui, o Hook fetchMembers eh chamado quando o componente renderiza ou quando o id do grupo muda.*/
-     useEffect(() => {fetchMembers();}, [id]);
-    /*--------------------------------------------------------------------------------------------------------------------------------------------*/
+    useEffect(() => { loadMembers(); }, [id]);
 
     return (
-        <Container>
-            <AddMember id={id} token={token}  onMemberAdded={fetchMembers}></AddMember>
-            <MemberList  id={id} token={token} onMemberRemovedOrUpdated={fetchMembers} members={members} ></MemberList>
-        </Container>
+        <PageContainerGroup group_id={id} title={"Membros do Grupo"}>
+            <MemberList id={id} token={token} onMemberRemovedOrUpdated={loadMembers} members={members} />
+            <AddMember id={id} token={token} onMemberAdded={loadMembers} />
+        </PageContainerGroup>
     );
 };
 

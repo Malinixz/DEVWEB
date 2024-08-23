@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Groups from './pages/Groups';
 import GroupMembers from './pages/Group/GroupMembers';
+import GroupActivities from './pages/Group/GroupActivities';
 import GroupHome from './pages/GroupHome'
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/Groups" element={<Groups />} />
           <Route path="/Groups2" element={<GroupHome />} />
           <Route path="/GroupMembers/:id" element={<GroupMembers />}/>
+          <Route path="/GroupActivities/:id" element={<GroupActivities />}/>
         </Routes>
       </Router>
     </div>

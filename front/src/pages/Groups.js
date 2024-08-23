@@ -1,13 +1,15 @@
 import * as React from 'react';
-import { TextField, Button, Table, TableHead, TableBody, TableCell, TableRow, Box, Container, IconButton, Modal, Typography } from '@mui/material';
+import { Box, Container, Modal } from '@mui/material';
+import { TextField, Button, Typography, Paper } from '@mui/material';
+import { Table, TableHead, TableBody, TableCell, TableRow, TableContainer } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import Pagination from '@mui/material/Pagination';
 import { Link } from 'react-router-dom';
+
+import GroupsActions from '../components/GroupsActions';
 
 const theme = createTheme();
 
@@ -47,6 +49,7 @@ function Groups() {
       setFilterMembro(false);
     }
   };
+
   const handleCreateGroup = async () => {
     try {
       const response = await axios.post(
@@ -90,65 +93,31 @@ function Groups() {
   }, [currentPage, searchQuery, filterMembro, filterAdministrador, token]);
 
   return (
-    <ThemeProvider theme={theme}>
+    <Box sx={{display:'flex'}}>
       <Navbar />
       <Container component="main" maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <TextField
-            variant="outlined"
-            placeholder="Pesquisar"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <IconButton position="start">
-                  <SearchIcon />
-                </IconButton>
-              ),
-            }}
-            sx={{ width: '40%' }}
-          />
-          <Box>
-            <Button 
-              variant={filterMembro ? "contained" : "outlined"} 
-              color="primary" 
-              sx={{ mr: 2 }}
-              onClick={() => handleFilterChange('membro')}
-            >
-              Membro
-            </Button>
-            <Button 
-              variant={filterAdministrador ? "contained" : "outlined"} 
-              color="secondary" 
-              sx={{ mr: 2 }}
-              onClick={() => handleFilterChange('administrador')}
-            >
-              Administrador
-            </Button>
-            <Button variant="contained" color="success" startIcon={<AddIcon />} onClick={handleOpen}>
-              + Grupo
-            </Button>
-          </Box>
-        </Box>
+        <GroupsActions searchQuery={searchQuery} setSearchQuery={setSearchQuery} filterMember={filterMembro} filterAdmin={filterAdministrador} handleFilterChange={handleFilterChange} handleOpen={handleOpen} />
 
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nome</TableCell>
-              <TableCell>Membros</TableCell>
-              <TableCell>Atividades</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {groupsData && groupsData.map((group, index) => (
-              <TableRow key={index} component={Link} to={`/GroupMembers/${group.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <TableCell>{group.nome}</TableCell>
-                <TableCell>{group.quantidade_membros}</TableCell>
-                <TableCell>{group.quantidade_atividades}</TableCell>
+        <TableContainer component={Paper} sx={{ maxWidth: '100%', margin: '16px auto' }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Nome</TableCell>
+                <TableCell>Membros</TableCell>
+                <TableCell>Atividades</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {groupsData && groupsData.map((group, index) => (
+                <TableRow key={index} component={Link} to={`/GroupMembers/${group.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <TableCell>{group.nome}</TableCell>
+                  <TableCell>{group.quantidade_membros}</TableCell>
+                  <TableCell>{group.quantidade_atividades}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
         <Pagination
           count={totalPages}
@@ -193,7 +162,7 @@ function Groups() {
           </Box>
         </Box>
       </Modal>
-    </ThemeProvider>
+    </Box>
   );
 }
 
