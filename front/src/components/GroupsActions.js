@@ -18,8 +18,7 @@ const GroupSearchTextField = ({searchQuery, setSearchQuery}) =>
                 </IconButton>
                 ),
             }}
-            sx={{ width: '40%' }}
-        />
+            sx={{ width: '40%' }} />
     );
 }
 
