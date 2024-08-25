@@ -1,30 +1,22 @@
-import * as React from 'react';
-import { TextField, Button, Table, TableHead, TableBody, TableCell, TableRow, Box, Container, IconButton, Modal, Typography } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
-import Navbar from '../components/Navbar';
-import axios from 'axios';
+// Groups.js
+import React from 'react';
+import { Box, Container } from '@mui/material';
 import { useEffect, useState } from 'react';
 import Pagination from '@mui/material/Pagination';
-import { Link } from 'react-router-dom';
 
-const theme = createTheme();
+import Navbar from '../components/Navbar';
+import GroupsActions from '../components/GroupsActions';
+import GroupsList from '../components/GroupsList';
+import CreateGroupModal from '../components/CreateGroupModal';
 
-const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
+import { fetchGroups } from '../services/GroupServices';
 
-function Groups() {
+function Groups()
+{
+  /*Token de Autenticação*/
   const token = localStorage.getItem('token');
+
+  /* Estados */
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -32,168 +24,59 @@ function Groups() {
   const [filterMembro, setFilterMembro] = useState(false);
   const [filterAdministrador, setFilterAdministrador] = useState(false);
   const [open, setOpen] = useState(false);
-  const [groupName, setGroupName] = useState('');
-  const [groupDescription, setGroupDescription] = useState('');
 
+  /* Arrow functions para mudar estados da página */
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const handlePageClick = (event, pageClicked) => setCurrentPage(pageClicked);
-  const handleFilterChange = (filterType) => {
-    if (filterType === 'membro') {
+  const handlePageClick = (_event, pageClicked) => setCurrentPage(pageClicked);
+
+  /* Muda estado dos filtros filtros */
+  const handleFilterChange = (filterType) =>
+  {
+    if (filterType === 'membro')
+    {
       setFilterMembro(!filterMembro);
       setFilterAdministrador(false);
-    } else if (filterType === 'administrador') {
+    }
+    else if (filterType === 'administrador')
+    {
       setFilterAdministrador(!filterAdministrador);
       setFilterMembro(false);
     }
   };
-  const handleCreateGroup = async () => {
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_HTTP_URL}/create-group`,
-        { nome: groupName, descricao: groupDescription },
-        { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } }
-      );
-      if (response.status === 200) {
-        handleClose();    // Fechar o Modal
-        fetchGroups();    // Recarregar os grupos após a criação
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      window.alert(`Erro ao criar Grupo: ${error.response ? error.response.data.erro : error.message}`);
-    }
-  };
 
-  const fetchGroups = async () => {
-    try {
-      const response = await axios.get(`${process.env.REACT_APP_HTTP_URL}/list-groups`, {
-        params: { 
-          page: currentPage,
-          nome: searchQuery,
-          membro: filterMembro,
-          administrador: filterAdministrador
-        },
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
-      });
-      if (response.status === 200) {
-        setGroupsData(response.data.grupos);
-        setTotalPages(response.data.totalPaginas);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      window.alert(`Erro ao obter Grupos: ${error.response ? error.response.data.erro : error.message}`);
+  /* Carrega lista de grupos */
+  const loadGroups = async () =>
+  {
+    try
+    {
+      const response = await fetchGroups({ currentPage, searchQuery, filterMembro, filterAdministrador, token });
+      setGroupsData(response.data.grupos);
+      setTotalPages(response.data.totalPaginas);
     }
-  };
+    catch(error)
+    {
+      console.error(error.message);
+    }
+  }
 
-  useEffect(() => {
-    fetchGroups();
+  useEffect(() =>
+  {
+    loadGroups();
+    console.log(groupsData); // Check the values here
   }, [currentPage, searchQuery, filterMembro, filterAdministrador, token]);
 
+  /* Componentes */
   return (
-    <ThemeProvider theme={theme}>
+    <Box sx={{display:'flex'}}>
       <Navbar />
-      <Container component="main" maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <TextField
-            variant="outlined"
-            placeholder="Pesquisar"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <IconButton position="start">
-                  <SearchIcon />
-                </IconButton>
-              ),
-            }}
-            sx={{ width: '40%' }}
-          />
-          <Box>
-            <Button 
-              variant={filterMembro ? "contained" : "outlined"} 
-              color="primary" 
-              sx={{ mr: 2 }}
-              onClick={() => handleFilterChange('membro')}
-            >
-              Membro
-            </Button>
-            <Button 
-              variant={filterAdministrador ? "contained" : "outlined"} 
-              color="secondary" 
-              sx={{ mr: 2 }}
-              onClick={() => handleFilterChange('administrador')}
-            >
-              Administrador
-            </Button>
-            <Button variant="contained" color="success" startIcon={<AddIcon />} onClick={handleOpen}>
-              + Grupo
-            </Button>
-          </Box>
-        </Box>
-
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nome</TableCell>
-              <TableCell>Membros</TableCell>
-              <TableCell>Atividades</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {groupsData && groupsData.map((group, index) => (
-              <TableRow key={index} component={Link} to={`/GroupMembers/${group.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <TableCell>{group.nome}</TableCell>
-                <TableCell>{group.quantidade_membros}</TableCell>
-                <TableCell>{group.quantidade_atividades}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
-        <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={handlePageClick}
-        />
+      <Container component='main' maxWidth='lg' sx={{ mt: 4, mb: 4 }}>
+        <GroupsActions searchQuery={searchQuery} setSearchQuery={setSearchQuery} filterMember={filterMembro} filterAdmin={filterAdministrador} handleFilterChange={handleFilterChange} handleOpen={handleOpen} />
+        <GroupsList groupsData={groupsData} />
+        <Pagination count={totalPages} page={currentPage} onChange={handlePageClick} />
       </Container>
-
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description"
-      >
-        <Box sx={modalStyle}>
-          <Typography id="modal-title" variant="h6" component="h2">
-            Criar Novo Grupo
-          </Typography>
-          <TextField
-            fullWidth
-            label="Nome do Grupo"
-            margin="normal"
-            value={groupName}
-            onChange={(e) => setGroupName(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            label="Descrição do Grupo"
-            margin="normal"
-            multiline
-            rows={4}
-            value={groupDescription}
-            onChange={(e) => setGroupDescription(e.target.value)}
-          />
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-            <Button variant="contained" color="primary" onClick={handleCreateGroup}>
-              Criar Grupo
-            </Button>
-            <Button variant="contained" color="secondary" onClick={handleClose}>
-              Cancelar
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
-    </ThemeProvider>
+      <CreateGroupModal open={open} handleClose={handleClose} loadGroups={loadGroups} token={token} />
+    </Box>
   );
 }
 
