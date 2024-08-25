@@ -35,6 +35,32 @@ CREATE TABLE atividades (
     descricao TEXT,
     data_entrega TIMESTAMP NOT NULL,
     estado estado_atividade NOT NULL DEFAULT 'pendente',
+    data_conclusao TIMESTAMP,
     FOREIGN KEY (id_grupo) REFERENCES grupos(id),
     FOREIGN KEY (id_criador) REFERENCES usuarios(id)
+);
+
+CREATE TABLE tarefas (
+    id SERIAL PRIMARY KEY,
+    id_atividade INTEGER NOT NULL,
+    id_responsavel INTEGER NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    estado estado_atividade NOT NULL DEFAULT 'pendente',
+    data_entrega TIMESTAMP NOT NULL,
+    data_conclusao TIMESTAMP,
+    FOREIGN KEY (id_atividade) REFERENCES atividades(id),
+    FOREIGN KEY (id_responsavel) REFERENCES usuarios(id)
+);
+
+
+CREATE TABLE mensagem (
+    id SERIAL PRIMARY KEY,
+    id_grupo INTEGER NOT NULL,
+    autor INTEGER NOT NULL,
+    texto VARCHAR(255) NOT NULL,
+    eh_aviso BOOLEAN,
+    data_hora TIMESTAMP NOT NULL,
+    FOREIGN KEY (id_grupo) REFERENCES grupos(id),
+    FOREIGN KEY (autor) REFERENCES usuarios(id)
 );
