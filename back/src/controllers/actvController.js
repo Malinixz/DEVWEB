@@ -158,7 +158,6 @@ exports.updateActivity = async (req, res) => {
     }
 };
 
-
 exports.deleteActivity = async (req, res) => {
     const { group_id, activity_id } = req.params;
 
@@ -215,7 +214,6 @@ exports.completeActivity = async (req, res) => {
         handleError(res, "Erro ao concluir atividade: " + err.message);
     }
 };
-
 
 exports.cancelActivity = async (req, res) => {
     const { group_id, activity_id } = req.params;
