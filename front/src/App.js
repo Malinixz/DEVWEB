@@ -28,7 +28,7 @@ function App() {
           <Route path="/Home" element={<Home />} />
           <Route path="/Profile" element={<Profile />} />
           <Route path="/Groups" element={<Groups />} />
-          <Route path="/Groups2" element={<GroupHome />} />
+          <Route path="/Groups/:id" element={<GroupHome />} />
           <Route path="/GroupMembers/:id" element={<GroupMembers />}/>
           <Route path="/GroupActivities/:id" element={<GroupActivities />}/>
         </Routes>

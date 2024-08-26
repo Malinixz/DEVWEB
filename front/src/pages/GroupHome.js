@@ -1,28 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import io from 'socket.io-client';
+import { useParams } from 'react-router-dom';
 
-const Chat = () => {
-  const [messages, setMessages] = useState([]);
+const Chat = () => {  
+  const socket = useRef(null); // garante que havera apenas uma instancia por pagina independente das renderizacoes
+  const [messageList, setMessageList] = useState([]);
   const [input, setInput] = useState('');
-  const ws = new WebSocket('ws://localhost:8080');
+  const groupId = useParams().id; // guarda id do grupo presente na url
 
   useEffect(() => {
-    ws.onmessage = (event) => {
-      setMessages((prevMessages) => [...prevMessages, event.data]);
-    };
+    if (!socket.current) {
+      socket.current = io(process.env.REACT_APP_WS_URL, {
+        auth: { token: localStorage.getItem('token') },
+        query : { groupId : groupId , username : localStorage.getItem('login')}
+      });
+      console.log('Socket inicializado');
 
-    return () => ws.close();
-  }, []);
+      // Carrega mensagens anteriores
+      socket.current.on('previous_messages', (data) => {
+        setMessageList(data);
+        console.log(data)
+      });
+      // Escuta mensagens recebidas do servidor
+      socket.current.on('receive_message', (data) => {
+        setMessageList((current) => [...current, data]);
+        console.log(data)
+      });
+    }
+    return () => {
+      if (socket.current && typeof socket.current.disconnect === 'function') {
+        socket.current.disconnect();  // Desconecta o socket corretamente
+      }
+      socket.current = null;
+    };
+  }, [groupId]);
 
   const sendMessage = () => {
-    ws.send(input);
+    if (socket.current) {
+      socket.current.emit('send_message', {
+        text : input
+      });
+    }
     setInput('');
   };
 
   return (
     <div>
       <div>
-        {messages.map((msg, index) => (
-          <div key={index}>{msg}</div>
+        {messageList.map((msg, index) => (
+          <div key={index}>{`${msg.author} : ${msg.text}`}</div>
         ))}
       </div>
       <input

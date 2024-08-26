@@ -31,7 +31,7 @@ function NavbarGroup({ group_id })
                     <ListItemIcon><EventIcon /></ListItemIcon>
                     <ListItemText primary="Atividades" />
                 </ListItemButton>
-                <ListItemButton sx={getListItemSx('/Conversa')}>
+                <ListItemButton LinkComponent={Link} to={`/Groups/${group_id}`} sx={getListItemSx('/Conversa')}>
                     <ListItemIcon><ChatIcon /></ListItemIcon>
                     <ListItemText primary="Conversa" />
                 </ListItemButton>

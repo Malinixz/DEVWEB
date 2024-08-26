@@ -17,6 +17,6 @@
     "jsonwebtoken": "^9.0.2",
     "node-php-password": "^0.1.2",
     "pg": "^8.11.5",
-    "ws": "^8.18.0"
+    "socket.io": "^4.7.5"
   }
 }
