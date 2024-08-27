@@ -8,6 +8,7 @@ const index = require("./routes/index");
 const user = require("./routes/userRoutes");
 const group = require("./routes/groupRoutes");
 const activity = require("./routes/actvRoutes");
+const task = require("./routes/taskRoutes");
 
 const app = express();  // instancia uma aplicacao do express
 
@@ -20,6 +21,7 @@ app.use(index);
 app.use(user);
 app.use(group);
 app.use(activity);
+app.use(task);
 
 module.exports = app;  // significa que o require("./src/app") vai exportar o app
 
