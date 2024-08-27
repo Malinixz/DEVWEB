@@ -62,7 +62,7 @@ function RemoveOrUpdateDialog({id, token, user_id, onMemberRemovedOrUpdated, is_
     /*Componente*/
     return(
         <div>
-            <Button variant="contained" color="primary" onClick={handleOpen}>...</Button>
+            <Button variant="outlined" color="primary" onClick={handleOpen}>...</Button>
             <Dialog open={open} onClose={handleClose}>
                 <DialogActions>
                     <Button onClick={handleRemoveMember} color="primary" disabled={loading}> {loading ? 'Removendo...' : 'Remover Membro'} </Button>

@@ -6,7 +6,8 @@ import PageContainerGroup from '../../components/PageContainerGroup';
 import ActivitiesList from '../../components/ActvComponents/ActivitiesList';
 import AddActivityModal from '../../components/ActvComponents/AddActivity';
 
-function GroupActivities() {
+function GroupActivities()
+{
     const { id } = useParams();
     const token = localStorage.getItem('token');
     const [activities, setActivities] = useState([]);
