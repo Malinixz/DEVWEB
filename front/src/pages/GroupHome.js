@@ -1,62 +1,62 @@
 import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import { useParams } from 'react-router-dom';
+import PageContainerGroup from '../components/PageContainerGroup';
+import ChatMessages from '../components/ChatComponents/ChatMessages';
+import ChatInput from '../components/ChatComponents/ChatInput';
 
 const Chat = () => {  
-  const socket = useRef(null); // garante que havera apenas uma instancia por pagina independente das renderizacoes
+  const socket = useRef(null);
   const [messageList, setMessageList] = useState([]);
   const [input, setInput] = useState('');
-  const groupId = useParams().id; // guarda id do grupo presente na url
+  const groupId = useParams().id;
+  const currentUser = localStorage.getItem('login'); // Obtém o nome de usuário atual
 
   useEffect(() => {
     if (!socket.current) {
       socket.current = io(process.env.REACT_APP_WS_URL, {
         auth: { token: localStorage.getItem('token') },
-        query : { groupId : groupId , username : localStorage.getItem('login')}
+        query : { groupId : groupId , username : currentUser }
       });
-      console.log('Socket inicializado');
 
-      // Carrega mensagens anteriores
       socket.current.on('previous_messages', (data) => {
-        setMessageList(data);
-        console.log(data)
+        const formattedData = data.map((msg) => ({
+          ...msg,
+          isCurrentUser: msg.author === currentUser, // Verifica se a mensagem é do usuário atual
+        }));
+        setMessageList(formattedData);
       });
-      // Escuta mensagens recebidas do servidor
+
       socket.current.on('receive_message', (data) => {
-        setMessageList((current) => [...current, data]);
-        console.log(data)
+        setMessageList((current) => [...current, {
+          ...data,
+          isCurrentUser: data.author === currentUser,
+        }]);
       });
     }
     return () => {
       if (socket.current && typeof socket.current.disconnect === 'function') {
-        socket.current.disconnect();  // Desconecta o socket corretamente
+        socket.current.disconnect();
       }
       socket.current = null;
     };
-  }, [groupId]);
+  }, [groupId, currentUser]);
 
   const sendMessage = () => {
     if (socket.current) {
       socket.current.emit('send_message', {
-        text : input
+        text : input,
+        author: currentUser,
       });
     }
     setInput('');
   };
 
   return (
-    <div>
-      <div>
-        {messageList.map((msg, index) => (
-          <div key={index}>{`${msg.author} : ${msg.text}`}</div>
-        ))}
-      </div>
-      <input
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
-      <button onClick={sendMessage}>Enviar</button>
-    </div>
+    <PageContainerGroup group_id={groupId} title="Bate-Papo">
+      <ChatMessages messageList={messageList} />
+      <ChatInput input={input} setInput={setInput} sendMessage={sendMessage} />
+    </PageContainerGroup>
   );
 };
 
