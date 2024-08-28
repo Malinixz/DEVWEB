@@ -5,12 +5,14 @@ import Button from '@mui/material/Button';
 import Navbar from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
 
-export default function Home()
-{
+export default function Home() {
   const navigate = useNavigate();
 
   const handleSignOut = () => {
-    navigate('/'); // Redireciona para o login
+    localStorage.removeItem('token');
+    localStorage.removeItem('login');
+    localStorage.removeItem('email');
+    navigate('/SignIn'); // Redirect to SignIn page
   };
 
   return (
@@ -36,7 +38,7 @@ export default function Home()
             color: 'text.secondary'
           }}
         >
-          Bem-vindo ao Conecta! A plataforma que conecta você a sua comunidade.
+          Bem-vindo ao Conecta! A plataforma que conecta você à sua comunidade.
         </Typography>
         <Button 
           variant="contained" 
