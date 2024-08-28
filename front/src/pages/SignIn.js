@@ -3,8 +3,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -17,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 
 const defaultTheme = createTheme();
 
-export default function SignIn({onLogin}) {
+export default function SignIn() {
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -37,8 +35,7 @@ export default function SignIn({onLogin}) {
         localStorage.setItem('login', response.data.login);
         localStorage.setItem('email', response.data.email);
         localStorage.setItem('token', response.data.token);
-        onLogin(true);
-        navigate('/');  // Redireciona ao Home
+        navigate('/Home');  // Redireciona ao Home
       } else {
         window.alert("Erro ao Autenticar o Usuário");
       }
@@ -75,7 +72,7 @@ export default function SignIn({onLogin}) {
               required
               fullWidth
               id="email"
-              label="Email Address"
+              label="Email"
               name="email"
               autoComplete="email"
               autoFocus
@@ -85,14 +82,10 @@ export default function SignIn({onLogin}) {
               required
               fullWidth
               name="password"
-              label="Password"
+              label="Senha"
               type="password"
               id="password"
               autoComplete="current-password"
-            />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
             />
             <Button
               type="submit"
@@ -100,7 +93,7 @@ export default function SignIn({onLogin}) {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              Login
             </Button>
             <Grid container>
               <Grid item xs>
@@ -110,7 +103,7 @@ export default function SignIn({onLogin}) {
               </Grid>
               <Grid item>
                 <Link href="/SignUp" variant="body2">
-                  {"Don't have an account? Sign Up"}
+                  {"Não possui uma conta? Registre-se"}
                 </Link>
               </Grid>
             </Grid>

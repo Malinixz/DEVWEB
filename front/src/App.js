@@ -1,7 +1,5 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { useState } from 'react';
-import { authToken } from './helpers/Utils'
 import SignUp from './pages/SignUp';
 import SignIn from './pages/SignIn';
 import Home from './pages/Home';
@@ -10,27 +8,22 @@ import Groups from './pages/Groups';
 import GroupMembers from './pages/Group/GroupMembers';
 import GroupActivities from './pages/Group/GroupActivities';
 import GroupHome from './pages/GroupHome'
+import ProtectedRoute from './components/RoutesComponents/ProtectedRoute';
+import GroupRoute from './components/RoutesComponents/GroupProtectedRoute';
 
 function App() {
-  //??? ajustar a logica de verificar se ja esta logado
-  const [isLogged, setIsLogged] = useState(authToken() ? false : true);
-  // console.log(isLogged);  //???
-  function handleLogin(isAuth) {
-    setIsLogged(isAuth);
-  }
-
   return (
     <div className="App">
       <Router>
         <Routes>
-          <Route path="/" element={ isLogged ? <Home /> : <SignIn onLogin={handleLogin} />} />
+          <Route path="/" element={ <SignIn/>} />
           <Route path="/SignUp" element={<SignUp />} />
-          <Route path="/Home" element={<Home />} />
-          <Route path="/Profile" element={<Profile />} />
-          <Route path="/Groups" element={<Groups />} />
-          <Route path="/Groups/:id" element={<GroupHome />} />
-          <Route path="/GroupMembers/:id" element={<GroupMembers />}/>
-          <Route path="/GroupActivities/:id" element={<GroupActivities />}/>
+          <Route path="/Home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/Profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/Groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
+          <Route path="/Groups/:id" element={<GroupRoute><GroupHome /></GroupRoute>} />
+          <Route path="/GroupMembers/:id" element={<GroupRoute><GroupMembers /></GroupRoute>}/>
+          <Route path="/GroupActivities/:id" element={<GroupRoute><GroupActivities /></GroupRoute>}/>
         </Routes>
       </Router>
     </div>

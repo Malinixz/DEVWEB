@@ -221,6 +221,22 @@ exports.deleteUser = async (req, res) => {
     }
 };
 
+exports.isMember = async (req,res) => {
+    const { group_id } = req.params;
+    
+    try{
+        if (!(await checkUserInGroup(group_id,req.user.id))) {
+            return handleError(res, "Usuário não está no grupo", 404)
+        } else {
+            return res.status(200).send({
+                sucesso : 1
+            })
+        }        
+    } catch (err) {
+        handleError(res, "Erro BD: " + err.message);
+    }
+}
+
 exports.updateMemberStatus = async (req, res) => {
     const { group_id } = req.params;
     const { user_id, is_admin } = req.body;

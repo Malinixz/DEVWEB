@@ -6,6 +6,7 @@ const verifyAdmin     = require('../middlewares/verifyAdmin');
 
 router.get('/list-groups' , auth.authToken, groupController.listGroups);
 router.get('/groups/:group_id/members', groupController.listGroupMembers);
+router.get('/groups/:group_id/isMember', auth.authToken, groupController.isMember);
 router.post('/create-group', auth.authToken, verifyParams(['nome','descricao']), groupController.createGroup);
 router.post('/groups/:group_id/members', auth.authToken, verifyAdmin, groupController.addUser);
 router.delete('/groups/:group_id/members', auth.authToken, verifyParams(['user_id']), verifyAdmin, groupController.deleteUser)
