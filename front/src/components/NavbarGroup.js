@@ -19,7 +19,7 @@ function NavbarGroup({ group_id })
     return (
         <Drawer sx={sxConfig} variant="permanent" anchor="left">
             <Box sx={boxSxConfig}>
-                <Typography variant="h5">Super App Z</Typography>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'White',  }}> Conecta </Typography>
             </Box>
             <Divider />
             <List>

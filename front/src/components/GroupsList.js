@@ -6,7 +6,7 @@ function GroupsList({groupsData})
     return (
         <TableContainer component={Paper} sx={{ maxWidth: '100%', margin: '16px auto' }}>
           <Table>
-            <TableHead>
+            <TableHead sx={{ bgcolor: 'primary.light' }}>
               <TableRow>
                 <TableCell>Nome</TableCell>
                 <TableCell>Membros</TableCell>
@@ -15,7 +15,7 @@ function GroupsList({groupsData})
             </TableHead>
             <TableBody>
               {groupsData && groupsData.map((group) => (
-                <TableRow key={group.id} component={Link} to={`/GroupMembers/${group.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <TableRow key={group.id} sx={{ '&:nth-of-type(odd)': { bgcolor: 'action.hover' } }} component={Link} to={`/GroupMembers/${group.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <TableCell>{group.nome}</TableCell>
                   <TableCell>{group.quantidade_membros}</TableCell>
                   <TableCell>{group.quantidade_atividades}</TableCell>

@@ -109,7 +109,7 @@ function Profile() {
                   onChange={(event) => setNewUserName(event.target.value)}
                 />
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={3}>
                 <Button variant="contained" color="primary" fullWidth onClick={handleUpdateUserName}>
                   Alterar nome
                 </Button>
@@ -129,7 +129,7 @@ function Profile() {
                   onChange={(event) => setNewEmail(event.target.value)}
                 />
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={3}>
                 <Button variant="contained" color="primary" fullWidth onClick={handleUpdateEmail}>
                   Alterar email
                 </Button>
@@ -160,7 +160,7 @@ function Profile() {
                   onChange={(event) => setNewPassword(event.target.value)}
                 />
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={3}>
                 <Button variant="contained" color="primary" fullWidth onClick={handleUpdatePassword}>
                   Alterar senha
                 </Button>

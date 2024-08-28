@@ -16,7 +16,8 @@ import axios from 'axios';
 
 const defaultTheme = createTheme();
 
-export default function SignUp() {
+export default function SignUp()
+{
   const handleSubmit = async (event) => {
     event.preventDefault();
     const DataForm = new FormData(event.currentTarget);
@@ -65,7 +66,7 @@ export default function SignUp() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign up
+            Cadastro
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
@@ -76,7 +77,7 @@ export default function SignUp() {
                   required
                   fullWidth
                   id="userName"
-                  label="User Name"
+                  label="Nome de Usuário"
                   autoFocus
                 />
               </Grid>
@@ -85,7 +86,7 @@ export default function SignUp() {
                   required
                   fullWidth
                   id="email"
-                  label="Email Address"
+                  label="Email"
                   name="email"
                   autoComplete="email"
                 />
@@ -95,7 +96,7 @@ export default function SignUp() {
                   required
                   fullWidth
                   name="password"
-                  label="Password"
+                  label="Senha"
                   type="password"
                   id="password"
                   autoComplete="new-password"
@@ -106,15 +107,9 @@ export default function SignUp() {
                   required
                   fullWidth
                   name="confpassword"
-                  label="Confim Password"
+                  label="Confime Senha"
                   type="password"
                   id="confpassword"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
                 />
               </Grid>
             </Grid>
@@ -124,15 +119,11 @@ export default function SignUp() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              Cadastrar
             </Button>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="/" variant="body2">
-                  Already have an account? Sign in
-                </Link>
-              </Grid>
-            </Grid>
+            <Link href="/" variant="body1">
+              Já tem conta? Faça login
+            </Link>
           </Box>
         </Box>
       </Container>
