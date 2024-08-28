@@ -3,8 +3,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -13,18 +11,21 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const defaultTheme = createTheme();
 
-export default function SignUp()
-{
+export default function SignUp() {
+  const navigate = useNavigate();
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const DataForm = new FormData(event.currentTarget);
-    if (DataForm.get('password') !== DataForm.get('confpassword')){
+    if (DataForm.get('password') !== DataForm.get('confpassword')) {
       window.alert('Senhas diferentes');
       return;
     }
+
     let data = {  // payload
       novo_login: DataForm.get('userName'),
       novo_email: DataForm.get('email'),
@@ -34,17 +35,17 @@ export default function SignUp()
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_HTTP_URL}/registrar`,
-        data,{headers: {'Content-Type': 'application/json'}}
+        data, { headers: { 'Content-Type': 'application/json' } }
       );
       if (response.status === 200) {
         window.alert(response.data.msg);
+        navigate('/SignIn'); // Redirect to SignIn page after successful registration
       } else {
         window.alert("Erro ao Registrar o Usuário");
       }
     } catch (error) {
       console.error('Error:', error);
       if (error.response) { // Verifica se houve retorno do servidor
-        // Exibir a mensagem do servidor, se disponível
         window.alert(`Erro: ${error.response.data.msg}`);
       }
     }
@@ -121,7 +122,7 @@ export default function SignUp()
             >
               Cadastrar
             </Button>
-            <Link href="/" variant="body1">
+            <Link href="/SignIn" variant="body1">
               Já tem conta? Faça login
             </Link>
           </Box>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, TextField, Button, MenuItem, CircularProgress } from '@mui/material';
 import { activityDetails, updateActivity, removeActivity, completeActivity } from '../../services/actvServices';
+import ActivityTasksModal from '../TaskComponents/TasksList';
 
 const modalStyle =
 {
