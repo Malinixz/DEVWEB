@@ -2,28 +2,50 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, TextField, Button, MenuItem, CircularProgress } from '@mui/material';
 import { activityDetails, updateActivity, removeActivity, completeActivity } from '../../services/actvServices';
 
+const modalStyle =
+{
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+};
+
 const statusOptions = ['em andamento', 'pendente', 'cancelado', 'em revisão', 'atrasado'];
 
-function ActivityDetailsModal({ groupId, activityId, token, loadActivities }) {
+function ActivityDetailsModal({ groupId, activityId, token, loadActivities })
+{
     const [open, setOpen] = useState(false);
     const [updatedActivity, setUpdatedActivity] = useState({});
     const [loading, setLoading] = useState(false);
-    const [fetching, setFetching] = useState(false);  // New state for fetching data
+    const [fetching, setFetching] = useState(false);  // estado para fetch
 
-    const fetchActivityDetails = async () => {
-        setFetching(true);  // Start fetching
-        try {
+    const fetchActivityDetails = async () =>
+    {
+        setFetching(true);  // Começa o fetch
+        try
+        {
             const data = await activityDetails({ groupId, activityId, token });
             setUpdatedActivity(data);
-        } catch (error) {
+        }
+
+        catch (error)
+        {
             console.error('Error fetching activity details:', error);
-        } finally {
-            setFetching(false);  // End fetching
+        }
+
+        finally
+        {
+            setFetching(false);  // Termina o fetch
         }
     };
 
-    const handleUpdateActivity = async () => {
-        setLoading(true);  // Start loading
+    const handleUpdateActivity = async () =>
+    {
+        setLoading(true);  // Começa o loading
         try {
             await updateActivity({
                 groupId,
@@ -39,43 +61,64 @@ function ActivityDetailsModal({ groupId, activityId, token, loadActivities }) {
         } catch (error) {
             window.alert('Error updating activity:', error);
         } finally {
-            setLoading(false);  // End loading
+            setLoading(false);  // Termina o loading
         }
     };
 
-    const handleRemoveActivity = async () => {
-        if (window.confirm('Tem certeza que deseja deletar esta atividade?')) {
-            setLoading(true);  // Start loading
-            try {
+    const handleRemoveActivity = async () =>
+    {
+        if (window.confirm('Tem certeza que deseja deletar esta atividade?'))
+        {
+            setLoading(true);  // Começa o loading
+            try
+            {
                 await removeActivity({ groupId, activityId, token });
                 loadActivities();
                 setOpen(false);
-            } catch (error) {
+            }
+
+            catch (error)
+            {
                 window.alert(`Erro ao obter atividades do grupo: ${error.response ? error.response.data.erro : error.message}`);
-            } finally {
-                setLoading(false);  // End loading
+            }
+
+            finally
+            {
+                setLoading(false);  // Termina o loading
             }
         }
     };
 
-    const handleCompleteActivity = async () => {
-        if (window.confirm('Tem certeza que deseja marcar esta atividade como concluída?')) {
-            setLoading(true);  // Start loading
-            try {
+    const handleCompleteActivity = async () =>
+    {
+        if (window.confirm('Tem certeza que deseja marcar esta atividade como concluída?'))
+        {
+            setLoading(true);  // Começa o loading
+            
+            try
+            {
                 const updatedActivity = await completeActivity({ groupId, activityId, token });
-                setUpdatedActivity(updatedActivity); // Update local state with the completed activity details
+                setUpdatedActivity(updatedActivity);
                 loadActivities();
                 setOpen(false);
-            } catch (error) {
+            }
+
+            catch (error)
+            {
                 window.alert(`Erro ao atualizar atividade: ${error.response ? error.response.data.erro : error.message}`);
-            } finally {
-                setLoading(false);  // End loading
+            }
+
+            finally
+            {
+                setLoading(false);  // Termina o loading
             }
         }
     };
 
-    useEffect(() => {
-        if (open) {
+    useEffect(() =>
+    {
+        if (open)
+        {
             fetchActivityDetails();
         }
     }, [open]);
@@ -182,14 +225,3 @@ function ActivityDetailsModal({ groupId, activityId, token, loadActivities }) {
 }
 
 export default ActivityDetailsModal;
-
-const modalStyle = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    boxShadow: 24,
-    p: 4,
-};

@@ -4,10 +4,10 @@ const auth              = require('../middlewares/auth');
 const verifyParams      = require('../middlewares/verifyParams');
 const verifyAdmin       = require('../middlewares/verifyAdmin');
 
-// Listar todas as tarefas de uma atividade
+// Listar todas as tarefas de uma atividade OK
 router.get('/groups/:group_id/activities/:activity_id/tasks', auth.authToken, taskController.getTasks);
 
-// Obter detalhes de uma tarefa específica
+// Obter detalhes de uma tarefa específica OK
 router.get('/groups/:group_id/activities/:activity_id/tasks/:task_id', auth.authToken, taskController.getTaskDetails);
 
 // Criar uma nova tarefa em uma atividade

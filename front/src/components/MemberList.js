@@ -10,7 +10,8 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
         onMemberRemovedOrUpdated: callback function para fetch da lista de membros.
         members: lista de membros.
 */
-function MemberList({ id, token, onMemberRemovedOrUpdated, members }) {
+function MemberList({ id, token, onMemberRemovedOrUpdated, members })
+{
     return (
         <TableContainer component={Paper} sx={{ maxWidth: '100%', margin: '16px auto' }}>
             <Table>
