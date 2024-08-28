@@ -1,6 +1,6 @@
 const db = require('../config/database');
 
-async function checkUserInGroup(group_id, user_id) {
+async function checkUserInGroup(group_id, user_id){
     const result = await db.query(
         "SELECT id_usuario FROM membros_grupo WHERE id_grupo = $1 AND id_usuario = $2",
         [group_id, user_id]

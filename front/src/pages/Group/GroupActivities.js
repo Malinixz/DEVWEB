@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@mui/material';
+import { Button, TextField, Grid } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { fetchActivities } from '../../services/actvServices';
 import PageContainerGroup from '../../components/PageContainerGroup';
 import ActivitiesList from '../../components/ActvComponents/ActivitiesList';
 import AddActivityModal from '../../components/ActvComponents/AddActivity';
+import AddIcon from '@mui/icons-material/Add';
 
-function GroupActivities()
-{
+function GroupActivities() {
     const { id } = useParams();
     const token = localStorage.getItem('token');
     const [activities, setActivities] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const loadActivities = async () => {
         try {
@@ -26,24 +27,39 @@ function GroupActivities()
         loadActivities();
     }, [id]);
 
+    const filteredActivities = activities.filter(activity =>
+        activity.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        activity.estado.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <PageContainerGroup group_id={id} title="Atividades do Grupo">
-            <ActivitiesList 
-                id={id} 
-                token={token} 
-                activities={activities} 
-                loadActivities={loadActivities} // Pass loadActivities to ActivitiesList
-            />
-            <Button variant="contained" color="primary" onClick={() => setModalOpen(true)}>
-                Adicionar Atividade
-            </Button>
-            <AddActivityModal 
-                open={isModalOpen} 
-                handleClose={() => setModalOpen(false)} 
-                loadActivities={loadActivities} 
-                groupId={id} 
-                token={token} 
-            />
+            <Grid container spacing={2} alignItems="center" justifyContent="space-between">
+                <Grid item xs={12} sm={8}>
+                    <TextField 
+                        sx={{ width: '100%' }} 
+                        label="Buscar" 
+                        variant="outlined" 
+                        margin="normal" 
+                        value={searchQuery} 
+                        onChange={(e) => setSearchQuery(e.target.value)} 
+                    />
+                </Grid>
+                <Grid item xs={12} sm={4} textAlign="right">
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        size="large" 
+                        startIcon={<AddIcon />} 
+                        onClick={() => setModalOpen(true)} 
+                        sx={{ backgroundColor: 'primary.main', color: 'primary.contrastText' }}
+                    >
+                        ATIVIDADE
+                    </Button>
+                </Grid>
+            </Grid>
+            <ActivitiesList id={id} token={token} activities={filteredActivities} loadActivities={loadActivities} />
+            <AddActivityModal open={isModalOpen} handleClose={() => setModalOpen(false)} loadActivities={loadActivities} groupId={id} token={token} />
         </PageContainerGroup>
     );
 }
