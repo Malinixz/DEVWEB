@@ -12,7 +12,7 @@ export default function Home() {
     localStorage.removeItem('token');
     localStorage.removeItem('login');
     localStorage.removeItem('email');
-    navigate('/SignIn'); // Redirect to SignIn page
+    navigate('/'); // Redirect to SignIn page
   };
 
   return (

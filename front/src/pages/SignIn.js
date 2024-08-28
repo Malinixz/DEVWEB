@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 
 const defaultTheme = createTheme();
 
-export default function SignIn({onLogin}) {
+export default function SignIn() {
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -34,8 +34,7 @@ export default function SignIn({onLogin}) {
         localStorage.setItem('login', response.data.login);
         localStorage.setItem('email', response.data.email);
         localStorage.setItem('token', response.data.token);
-        onLogin(true);
-        navigate('/');  // Redireciona ao Home
+        navigate('/Home');  // Redireciona ao Home
       } else {
         window.alert("Erro ao Autenticar o Usuário");
       }
@@ -60,11 +59,18 @@ export default function SignIn({onLogin}) {
             alignItems: 'center',
           }}
         >
+          <Typography component="h1" variant="h1" gutterBottom
+          sx={{ 
+            fontWeight: 'bold', 
+            color: 'primary.main', 
+          }}>
+            Conecta
+          </Typography>
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Login
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
@@ -72,7 +78,7 @@ export default function SignIn({onLogin}) {
               required
               fullWidth
               id="email"
-              label="Email Address"
+              label="Email"
               name="email"
               autoComplete="email"
               autoFocus
@@ -82,14 +88,10 @@ export default function SignIn({onLogin}) {
               required
               fullWidth
               name="password"
-              label="Password"
+              label="Senha"
               type="password"
               id="password"
               autoComplete="current-password"
-            />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
             />
             <Button
               type="submit"
@@ -99,18 +101,7 @@ export default function SignIn({onLogin}) {
             >
               Sign In
             </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="/SignUp" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
+            <Link href="/SignUp" variant="body1"> {"Não tem conta? Cadastre-se aqui"} </Link>
           </Box>
         </Box>
       </Container>
